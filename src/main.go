@@ -7,6 +7,7 @@ import (
 	Account "github.com/kaikoh95/web3go/src/account"
 	Client "github.com/kaikoh95/web3go/src/client"
 	Helpers "github.com/kaikoh95/web3go/src/helpers"
+	Wallet "github.com/kaikoh95/web3go/src/wallet"
 )
 
 func main() {
@@ -36,4 +37,22 @@ func main() {
 
 	pendingBalance := Account.GetAccountPendingBalance(client, account)
 	fmt.Println("pending balance", pendingBalance)
+
+	///// Wallet setup
+	privateKey := Wallet.GeneratePrivateKey()
+    fmt.Println("privateKey", privateKey)
+	privateKeyBytes := Wallet.GetPrivateKeyBytes(privateKey)
+    fmt.Println("privateKeyBytes", privateKeyBytes)
+	
+	publicKey := Wallet.GetPublicKey(privateKey)
+    fmt.Println("publicKey", publicKey)
+	
+	publicKeyECDSA := Wallet.GetPublicKeyECDSA(publicKey)
+	fmt.Println("publicKeyECDSA", publicKeyECDSA)
+
+	publicKeyHex := Wallet.GetPublicKeyHex(publicKeyECDSA)
+	fmt.Println("publicKeyHex", publicKeyHex)
+	
+	publicAddress := Wallet.GetPublicAddress(publicKeyECDSA)
+	fmt.Println("publicAddress", publicAddress)
 }
