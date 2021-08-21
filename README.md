@@ -48,4 +48,11 @@ Add other collaborators as the Reviewers.
 Once your PR has been approved and merged, you should see it appear on the `develop` branch.
 
 ### Release Workflow
-TBC
+
+When your feature branch is ready to be deployed
+
+Create a PR back to `main` branch
+
+Add other collaborators as the Reviewers.
+
+Once your PR has been approved and merged, you should see it appear on the `main` branch.
