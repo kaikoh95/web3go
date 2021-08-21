@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	Account "github.com/kaikoh95/web3go/src/account"
 	Client "github.com/kaikoh95/web3go/src/client"
 	Helpers "github.com/kaikoh95/web3go/src/helpers"
+	Keystores "github.com/kaikoh95/web3go/src/keystores"
 	Wallet "github.com/kaikoh95/web3go/src/wallet"
 )
 
@@ -55,4 +57,19 @@ func main() {
 	
 	publicAddress := Wallet.GetPublicAddress(publicKeyECDSA)
 	fmt.Println("publicAddress", publicAddress)
+
+	///// Keystores setup
+	ks := Keystores.InitKeyStore("./wallets")
+	password := "secret"
+	
+	var account accounts.Account
+	///// Create new account 
+	// account = Keystores.CreateNewAccount(ks, password)
+
+	///// Import account
+	file := "./wallets/UTC--2021-08-21T23-38-28.676160000Z--896562a998b4b819f23c05dc78c39e6f43f70b3d"
+	account =  Keystores.ImportAccountFromKeyStore(ks, file, password)
+	
+	accountAddressFromKeystores := Keystores.GetAccountAddress(account)
+	fmt.Println(Account.GetAccountAddressHash(accountAddressFromKeystores))
 }
