@@ -21,21 +21,21 @@ func main() {
 	///// Accounts setup
 	address := "0x71c7656ec7ab88b098defb751b7401b5f6d8976f"
 	blockNumber := big.NewInt(5532993)
-	account := Account.GetAccount(address)
-	fmt.Println("hex", account.Hex())
-	fmt.Println("hash hex", account.Hash().Hex())
-	fmt.Println("bytes", account.Bytes())
+	accountAddress := Account.GetAccountAddress(address)
+	fmt.Println("hex", Account.GetAccountAddressHash(accountAddress))
+	fmt.Println("hash hex", Account.GetAccountAddressHexHash(accountAddress))
+	fmt.Println("bytes", Account.GetAccountAddressBytes(accountAddress))
 
-	balance := Account.GetAccountBalance(client, account)
+	balance := Account.GetAccountBalance(client, accountAddress)
 	fmt.Println("balance", balance)
 
-	balanceAtBlockTime := Account.GetAccountBalanceAtBlockTime(client, account, blockNumber)
+	balanceAtBlockTime := Account.GetAccountBalanceAtBlockTime(client, accountAddress, blockNumber)
 	fmt.Println("balance at block time", balanceAtBlockTime)
 
 	weiBalance := Helpers.ConvertToWei(balance)
 	fmt.Println("wei balance", weiBalance)
 
-	pendingBalance := Account.GetAccountPendingBalance(client, account)
+	pendingBalance := Account.GetAccountPendingBalance(client, accountAddress)
 	fmt.Println("pending balance", pendingBalance)
 
 	///// Wallet setup
