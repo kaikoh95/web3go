@@ -2,7 +2,7 @@ package wallet
 
 import (
 	"crypto/ecdsa"
-	"fmt"
+	"log"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -12,8 +12,7 @@ import (
 func GeneratePrivateKey() *ecdsa.PrivateKey {
 	privateKey, err := crypto.GenerateKey()
 	if err != nil {
-		// log.Fatal(err)
-		fmt.Println("error generating private key", err)
+		log.Fatal("error generating private key", err)
 	}
 	return privateKey
 }
@@ -35,8 +34,7 @@ func GetPublicKey(privateKey *ecdsa.PrivateKey) interface{} {
 func GetPublicKeyECDSA(publicKey interface{}) *ecdsa.PublicKey {
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
     if !ok {
-        // log.Fatal("error casting public key to ECDSA")
-        fmt.Println("error casting public key to ECDSA")
+        log.Fatal("error casting public key to ECDSA")
     }
 	return publicKeyECDSA
 }
