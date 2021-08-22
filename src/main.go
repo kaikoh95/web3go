@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	Account "github.com/kaikoh95/web3go/src/account"
@@ -22,17 +21,17 @@ func main() {
 	
 	///// Accounts setup
 	address := "0x71c7656ec7ab88b098defb751b7401b5f6d8976f"
-	blockNumber := big.NewInt(5532993)
 	accountAddress := Account.GetAccountAddress(address)
 	fmt.Println("hex", Account.GetAccountAddressHash(accountAddress))
 	fmt.Println("hash hex", Account.GetAccountAddressHexHash(accountAddress))
 	fmt.Println("bytes", Account.GetAccountAddressBytes(accountAddress))
-
+	
 	balance := Account.GetAccountBalance(client, accountAddress)
 	fmt.Println("balance", balance)
-
-	balanceAtBlockTime := Account.GetAccountBalanceAtBlockTime(client, accountAddress, blockNumber)
-	fmt.Println("balance at block time", balanceAtBlockTime)
+	
+	// blockNumber := big.NewInt(5532993)
+	// balanceAtBlockTime := Account.GetAccountBalanceAtBlockTime(client, accountAddress, blockNumber)
+	// fmt.Println("balance at block time", balanceAtBlockTime)
 
 	weiBalance := Helpers.ConvertToWei(balance)
 	fmt.Println("wei balance", weiBalance)
