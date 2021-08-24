@@ -2,12 +2,15 @@ package main
 
 import (
 	"fmt"
+	"log"
 
-	// Account "github.com/kaikoh95/web3go/src/account"
+	hdwallet "github.com/miguelmota/go-ethereum-hdwallet"
+
+	Account "github.com/kaikoh95/web3go/src/account"
 	// Blocks "github.com/kaikoh95/web3go/src/blocks"
 	Client "github.com/kaikoh95/web3go/src/client"
 	// Transactions "github.com/kaikoh95/web3go/src/transactions"
-	// Helpers "github.com/kaikoh95/web3go/src/helpers"
+	Helpers "github.com/kaikoh95/web3go/src/helpers"
 	// Keystores "github.com/kaikoh95/web3go/src/keystores"
 	// Wallet "github.com/kaikoh95/web3go/src/wallet"
 )
@@ -15,12 +18,34 @@ import (
 func main() {
 	client := Client.InitWithDefaultNetwork()
 	fmt.Println("we have a connection", client)
+
+	var mnemonic string
+	mnemonic = Helpers.GenerateMnemonic()
+	mnemonic = "man drastic shed trip rug extra bar trophy sign floor vibrant step square hour clap file brown black cable seminar squirrel holiday negative brain"
+	wallet, err := hdwallet.NewFromMnemonic(mnemonic)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// "m / purpose' / coin_type' / account' / change / address_index"
+	// reference from: https://ethereum.stackexchange.com/questions/70017/can-someone-explain-the-meaning-of-derivation-path-in-wallet-in-plain-english-s
+	dPath := "m/44'/60'/0'/0/0"
+	path := hdwallet.MustParseDerivationPath(dPath)
+	account, err := wallet.Derive(path, true)
+	if err != nil {
+		log.Fatal(err)
+	}
+	accountAddress := Account.GetAccountAddress(account)
+	accountAddressHex := Account.GetAccountAddressHex(accountAddress)
+	fmt.Println("eth wallet address ", accountAddressHex)
+
+	balance := Account.GetAccountBalance(client, accountAddress)
+	fmt.Println("balance", Helpers.ConvertToWei(balance))
 	
 	// ///// Accounts setup
 	// address := "0x71c7656ec7ab88b098defb751b7401b5f6d8976f"
-	// accountAddress := Account.GetAccountAddress(address)
-	// fmt.Println("hex", Account.GetAccountAddressHash(accountAddress))
-	// fmt.Println("hash hex", Account.GetAccountAddressHexHash(accountAddress))
+	// accountAddress := Account.GetAccountAddressFromHex(address)
+	// fmt.Println("hex", Account.GetAccountAddressHex(accountAddress))
+	// fmt.Println("hash hex", Account.GetAccountAddressHashHex(accountAddress))
 	// fmt.Println("bytes", Account.GetAccountAddressBytes(accountAddress))
 	
 	// balance := Account.GetAccountBalance(client, accountAddress)
@@ -36,38 +61,42 @@ func main() {
 	// pendingBalance := Account.GetAccountPendingBalance(client, accountAddress)
 	// fmt.Println("pending balance", pendingBalance)
 
-	// ///// Wallet setup
+	///// Wallet setup
 	// privateKey := Wallet.GeneratePrivateKey()
-    // fmt.Println("privateKey", privateKey)
+    // fmt.Println("privateKey ", privateKey)
+	
 	// privateKeyBytes := Wallet.GetPrivateKeyBytes(privateKey)
-    // fmt.Println("privateKeyBytes", privateKeyBytes)
+    // fmt.Println("privateKeyBytes ", privateKeyBytes)
+	
+	// privateKeyHex := Wallet.GetPrivateKeyHex(privateKey)
+    // fmt.Println("privateKeyHex ", privateKeyHex)
 	
 	// publicKey := Wallet.GetPublicKey(privateKey)
-    // fmt.Println("publicKey", publicKey)
+    // fmt.Println("publicKey ", publicKey)
 	
 	// publicKeyECDSA := Wallet.GetPublicKeyECDSA(publicKey)
-	// fmt.Println("publicKeyECDSA", publicKeyECDSA)
+	// fmt.Println("publicKeyECDSA ", publicKeyECDSA)
 
-	// publicKeyHex := Wallet.GetPublicKeyHex(publicKeyECDSA)
-	// fmt.Println("publicKeyHex", publicKeyHex)
+	// // publicKeyHex := Wallet.GetPublicKeyHex(publicKeyECDSA)
+	// // fmt.Println("publicKeyHex ", publicKeyHex)
 	
 	// publicAddress := Wallet.GetPublicAddress(publicKeyECDSA)
-	// fmt.Println("publicAddress", publicAddress)
+	// fmt.Println("publicAddress ", publicAddress)
 
 	// ///// Keystores setup
-	// ks := Keystores.InitKeyStore("./wallets")
-	// password := "secret"
-	
 	// var account accounts.Account
-	// ///// Create new account 
-	// // account = Keystores.CreateNewAccount(ks, password)
-
+	// ks := Keystores.InitKeyStore("./wallets")
+	// password := "password"
+	
+	///// Create new account 
+	// account = Keystores.CreateNewAccount(ks, password)
+	
 	// ///// Import account
 	// file := "./wallets/UTC--2021-08-21T23-38-28.676160000Z--896562a998b4b819f23c05dc78c39e6f43f70b3d"
 	// account =  Keystores.ImportAccountFromKeyStore(ks, file, password)
 	
-	// accountAddressFromKeystores := Keystores.GetAccountAddress(account)
-	// fmt.Println(Account.GetAccountAddressHash(accountAddressFromKeystores))
+	// accountAddressFromKeystores := Account.GetAccountAddress(account)
+	// fmt.Println("address hex ", Account.GetAccountAddressHex(accountAddressFromKeystores))
 
 	///// Blocks
 	// blockHeader := Blocks.GetBlockHeader(client)
