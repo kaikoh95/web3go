@@ -2,25 +2,18 @@ package main
 
 import (
 	"fmt"
-	"math/big"
 
 	// Account "github.com/kaikoh95/web3go/src/account"
-	Blocks "github.com/kaikoh95/web3go/src/blocks"
+	// Blocks "github.com/kaikoh95/web3go/src/blocks"
 	Client "github.com/kaikoh95/web3go/src/client"
+	// Transactions "github.com/kaikoh95/web3go/src/transactions"
 	// Helpers "github.com/kaikoh95/web3go/src/helpers"
 	// Keystores "github.com/kaikoh95/web3go/src/keystores"
 	// Wallet "github.com/kaikoh95/web3go/src/wallet"
 )
 
 func main() {
-	var blockNumber *big.Int
-
-	///// Client setup
-	//// refactor into dotenv
-	network := "https://mainnet.infura.io/v3/7073cc887d0449feaf3017cc7bc6090e"
-	// network := "http://localhost:8545"
-	
-	client := Client.InitClient(network)
+	client := Client.InitWithDefaultNetwork()
 	fmt.Println("we have a connection", client)
 	
 	// ///// Accounts setup
@@ -77,10 +70,37 @@ func main() {
 	// fmt.Println(Account.GetAccountAddressHash(accountAddressFromKeystores))
 
 	///// Blocks
-	blockHeader := Blocks.GetBlockHeader(client)
-	fmt.Println("blockHeader number", blockHeader.Number.String()) // 5671744
+	// blockHeader := Blocks.GetBlockHeader(client)
+	// fmt.Println("blockHeader number", blockHeader.Number.String()) // 5671744
+	// var blockNumber *big.Int
+    // blockNumber = big.NewInt(5671744)
+    // block := Blocks.GetFullBlock(client, blockNumber)
+	// blockStruct := Blocks.Block{
+	// 	Number: block.Number().Uint64(),
+	// 	Difficulty: block.Difficulty().Uint64(),
+	// 	Time: block.Time(),
+	// 	Hash: block.Hash(),
+	// 	Hex: block.Hash().Hex(),
+	// 	LenTransactions: len(block.Transactions()),
+	// }
+	// fmt.Println(blockStruct.FormatBlockDetails())
+
 	
-    blockNumber = big.NewInt(5671744)
-    block := Blocks.GetFullBlock(client, blockNumber)
-	fmt.Println(Blocks.FormatBlockDetails(block))
+	///// Transactions
+	// withReceipt := true
+    // blockNumber = big.NewInt(5671744)
+    // block := Blocks.GetFullBlock(client, blockNumber)
+	// transactions := Transactions.GetTransactionDetails(client, block, withReceipt)
+	// fmt.Println(transactions)
+	
+	// blockHash := Transactions.GetHashFromHex(block.Hash().Hex())
+	// fmt.Println("block hash ", blockHash)
+	// transactionsFromBlockHash := Transactions.GetTransactionsFromBlockHash(blockHash, client, withReceipt)
+	// fmt.Println(transactionsFromBlockHash)
+	
+	// transactionHex := "0x5d49fcaa394c97ec8a9c3e7bd9e8388d420fb050a52083ca52ff24b3b65bc9c2"
+	// fmt.Println("transactionHex ", transactionHex)
+    // transactionHash := Transactions.GetHashFromHex(transactionHex)
+	// singleTransactionFromTransactionHash := Transactions.GetSingleTransactionFromTransactionHash(transactionHash, client, withReceipt)
+	// fmt.Println("singleTransactionFromTransactionHash ", singleTransactionFromTransactionHash)
 }
