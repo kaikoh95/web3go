@@ -11,6 +11,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	Account "github.com/kaikoh95/web3go/src/account"
+	"github.com/tyler-smith/go-bip39"
 )
 
 // 18 decimal points precision
@@ -35,9 +36,11 @@ func IsValidEthAddress(address string) bool {
 	return isValid
 }
 
+// Checks if address is valid, 
+// and also checks if it is a smart contract or account.
 func IsContract(client *ethclient.Client, address string) bool {
 	isValid := IsValidEthAddress(address)
-	accountAddress := Account.GetAccountAddress(address)
+	accountAddress := Account.GetAccountAddressFromHex(address)
 	// nil is latest block
 	bytecode, err := client.CodeAt(context.Background(), accountAddress, nil) 
 	if err != nil {
@@ -46,4 +49,11 @@ func IsContract(client *ethclient.Client, address string) bool {
 	isContract := len(bytecode) > 0
 	fmt.Printf("is contract: %v\n", isContract)
 	return isContract && isValid
+}
+
+// Generate a mnemonic, user-friendly seed
+func GenerateMnemonic() string {
+	entropy, _ := bip39.NewEntropy(256)
+	mnemonic, _ := bip39.NewMnemonic(entropy)
+	return mnemonic
 }

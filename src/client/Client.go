@@ -15,5 +15,8 @@ func Init(network string) *ethclient.Client {
 }
 
 func InitWithDefaultNetwork() *ethclient.Client {
-    return Init("https://rinkeby.infura.io/v3/7073cc887d0449feaf3017cc7bc6090e")
+    var network string
+    network = "https://ropsten.infura.io/v3/7073cc887d0449feaf3017cc7bc6090e"
+    // network = "https://rinkeby.infura.io/v3/7073cc887d0449feaf3017cc7bc6090e"
+    return Init(network)
 }

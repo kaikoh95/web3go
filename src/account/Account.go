@@ -5,11 +5,12 @@ import (
 	"log"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func GetAccountAddress(address string) common.Address {
+func GetAccountAddressFromHex(address string) common.Address {
 	return common.HexToAddress(address)
 }
 
@@ -37,14 +38,18 @@ func GetAccountPendingBalance(client *ethclient.Client, account common.Address) 
 	return pendingBalance
 }
 
-func GetAccountAddressHash (accountAddress common.Address) string {
+func GetAccountAddressHex (accountAddress common.Address) string {
 	return accountAddress.Hex()
 }
 
-func GetAccountAddressHexHash (accountAddress common.Address) string {
+func GetAccountAddressHashHex (accountAddress common.Address) string {
 	return accountAddress.Hash().Hex()
 }
 
 func GetAccountAddressBytes (accountAddress common.Address) []byte {
 	return accountAddress.Bytes()
+}
+
+func GetAccountAddress(account accounts.Account) common.Address {
+	return account.Address
 }
