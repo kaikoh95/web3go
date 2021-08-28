@@ -13,7 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"
-	Account "github.com/kaikoh95/web3go/src/account"
+	"github.com/kaikoh95/web3go/src/Account"
 	hdwallet "github.com/miguelmota/go-ethereum-hdwallet"
 	"github.com/shopspring/decimal"
 )
