@@ -48,6 +48,7 @@ func GetPublicKeyHex(publicKeyECDSA *ecdsa.PublicKey) string {
 	return hexutil.Encode(publicKeyBytes)[4:]
 }
 
+// Public address that we usually see
 func GetPublicAddress(publicKeyECDSA *ecdsa.PublicKey) string {
 	address := crypto.PubkeyToAddress(*publicKeyECDSA).Hex()
 	return address

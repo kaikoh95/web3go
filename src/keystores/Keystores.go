@@ -6,7 +6,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/common"
 	Helpers "github.com/kaikoh95/web3go/src/helpers"
 )
 
@@ -32,8 +31,4 @@ func ImportAccountFromKeyStore(ks *keystore.KeyStore, file string, password stri
 		log.Fatal("error removing file", err)
 	}
 	return account
-}
-
-func GetAccountAddress(account accounts.Account) common.Address {
-	return account.Address
 }
