@@ -6,14 +6,19 @@ import (
 	"log"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/kaikoh95/web3go/src/Account"
 	"github.com/kaikoh95/web3go/src/client"
 	"github.com/kaikoh95/web3go/src/hdwallet"
+	"golang.org/x/crypto/sha3"
 
 	"github.com/kaikoh95/web3go/src/helpers"
 
+	store "github.com/kaikoh95/web3go/contracts"
 	"github.com/kaikoh95/web3go/src/transactions"
 )
 
@@ -30,11 +35,6 @@ func main() {
 	// networkUrl := "https://ropsten.etherscan.io"
 	networkUrl := "https://rinkeby.etherscan.io"
 	fmt.Println("network url", networkUrl)
-
-	////////////// start test code //////////////
-
-
-	////////////// end test code //////////////
 
 	// ///// Accounts setup
 	// address := "0x71c7656ec7ab88b098defb751b7401b5f6d8976f"
@@ -154,6 +154,11 @@ func main() {
 	nonce := Account.GetAccountPendingNonce(client, accountAddress1)
 	fmt.Println("sender nonce ", nonce)
 
+	gasLimit := helpers.EstimateGasLimit(client, &recPubAddr, nil)
+	gasPrice := helpers.SuggestGasPrice(client)
+	gasCost := helpers.CalcGasCost(gasLimit, gasPrice)
+	fmt.Println("gas cost in wei ", gasCost)
+
 	// weiBalance := Account.GetAccountBalance(client, accountAddress1)
 	// fmt.Println("balance in wei", weiBalance)
 	// decBalance := Helpers.ToDecimal(weiBalance, 18)
@@ -165,10 +170,6 @@ func main() {
 	amountToSend := 0.0005
 	weiAmountToSend := helpers.ToWei(amountToSend, 18)
 	fmt.Println("amount to send in wei", weiAmountToSend)
-	// gasLimit := helpers.EstimateGasLimit(client, &recPubAddr, nil)
-	gasPrice := helpers.SuggestGasPrice(client)
-	// gasCost := helpers.CalcGasCost(gasLimit, gasPrice)
-	// fmt.Println("gas cost in wei ", gasCost)
 
 	//// nil for just sending ETH 
 	// Legacy Tx
@@ -230,36 +231,99 @@ func main() {
 	tokenAddress := Account.GetAddressFromHex(Sator777)
 	fmt.Println(tokenAddress)
 
-	methodName := "transfer(address,uint256)"
-	tokenAmountToSend := 1000
-	data := transactions.PrepareTokenTransactionData(
-		methodName, &recPubAddr, tokenAmountToSend)
-	// gasPrice := helpers.SuggestGasPrice(client)
-	gasLimit := helpers.EstimateGasLimit(client, &recPubAddr, data)
-	fmt.Println("gas ", gasLimit) // 23256
-	fmt.Println("gas price", gasPrice) // 23256
-	fmt.Println("nonce ", nonce)
-	dynamicTx := types.DynamicFeeTx{
-		ChainID: chainID,
-		Nonce: nonce,
-		GasFeeCap: gasPrice.Mul(gasPrice, big.NewInt(50)),
-		GasTipCap: gasPrice.Mul(gasPrice, big.NewInt(50)),
-		Gas: gasLimit * 20,
-		To: &tokenAddress,
-		Value: big.NewInt(0),
-		Data: data,
-	}
-	tx := types.NewTx(&dynamicTx)
+	// methodName := "transfer(address,uint256)"
+	// tokenAmountToSend := 1000
+	// data := transactions.PrepareTokenTransactionData(
+	// 	methodName, &recPubAddr, tokenAmountToSend)
+	// // gasPrice := helpers.SuggestGasPrice(client)
+	// gasLimit := helpers.EstimateGasLimit(client, &recPubAddr, data)
+	// fmt.Println("gas ", gasLimit) // 23256
+	// fmt.Println("gas price", gasPrice) // 23256
+	// fmt.Println("nonce ", nonce)
+	// dynamicTx := types.DynamicFeeTx{
+	// 	ChainID: chainID,
+	// 	Nonce: nonce,
+	// 	GasFeeCap: gasPrice.Mul(gasPrice, big.NewInt(50)),
+	// 	GasTipCap: gasPrice.Mul(gasPrice, big.NewInt(50)),
+	// 	Gas: gasLimit * 20,
+	// 	To: &tokenAddress,
+	// 	Value: big.NewInt(0),
+	// 	Data: data,
+	// }
+	// tx := types.NewTx(&dynamicTx)
 
-	signedTx, err := types.SignTx(tx, types.LatestSignerForChainID(chainID), privateKey)
+	// signedTx, err := types.SignTx(tx, types.LatestSignerForChainID(chainID), privateKey)
+    // if err != nil {
+    //     log.Fatal(err)
+    // }
+	// err = client.SendTransaction(context.Background(), signedTx)
+	// if err != nil {
+	// 	log.Fatal("Unable to send transaction ", err)
+	// }
+	// fmt.Printf("tx hex %s \n", signedTx.Hash().Hex())
+	// fmt.Printf("check tx here %s/tx/%s \n", networkUrl, signedTx.Hash().Hex())
+
+	////////////// start test code //////////////
+	
+	///// Deploy Smart Contract
+	// auth, _ := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
+	// auth.Nonce = big.NewInt(int64(nonce))
+	// auth.Value = big.NewInt(0)     // in wei
+	// auth.GasLimit = uint64(29000000)
+	// auth.GasPrice = big.NewInt(1000000)
+
+	// address, tx, instance, err := store.DeployStore(auth, client)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// fmt.Println(address.Hex())  
+	// fmt.Printf("check tx here %s/tx/%s \n", networkUrl, tx.Hash().Hex())
+
+
+	// ///// Load Smart Contract
+	instance, err := store.NewStore(tokenAddress, client)
+	if err != nil {
+		log.Fatal("Unable to load smart contract", err)
+	}
+
+	var data []byte
+	transferFnSignature := []byte("burn(uint256,bytes)")
+	hash := sha3.NewLegacyKeccak256()
+	hash.Write(transferFnSignature)
+	methodID := hash.Sum(nil)[:4]
+	paddedAddress := common.LeftPadBytes(accountAddress1.Bytes(), 32)
+
+	weiTokenAmountToSend := helpers.ToWei(10, 18)
+	fmt.Println("token amount to send in wei", weiTokenAmountToSend)
+	paddedAmount := common.LeftPadBytes(weiTokenAmountToSend.Bytes(), 32)
+	data = append(data, paddedAddress...)
+	data = append(data, methodID...)
+	data = append(data, paddedAmount...)
+	fmt.Println("paddedAddress 32-bits", hexutil.Encode(paddedAddress))
+
+	auth, _ := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
+	auth.Nonce = big.NewInt(int64(nonce))
+	auth.Value = big.NewInt(0)     // in wei
+	auth.GasLimit = uint64(29000000)
+	auth.GasPrice = big.NewInt(1000000) // in units
+
+	burnTx, err := instance.Burn(auth, big.NewInt(1000), data)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(burnTx)
+	signedBurnTx, err := types.SignTx(burnTx, types.LatestSignerForChainID(chainID), privateKey)
     if err != nil {
         log.Fatal(err)
     }
-	err = client.SendTransaction(context.Background(), signedTx)
+	err = client.SendTransaction(context.Background(), signedBurnTx)
 	if err != nil {
 		log.Fatal("Unable to send transaction ", err)
 	}
-	fmt.Printf("tx hex %s \n", signedTx.Hash().Hex())
-	fmt.Printf("check tx here %s/tx/%s \n", networkUrl, signedTx.Hash().Hex())
-	
+	fmt.Printf("tx hex %s \n", signedBurnTx.Hash().Hex())
+	fmt.Printf("check tx here %s/tx/%s \n", networkUrl, signedBurnTx.Hash().Hex())
+
+	////////////// end test code //////////////
 }
