@@ -10,10 +10,11 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func GetAccountAddressFromHex(address string) common.Address {
+func GetAddressFromHex(address string) common.Address {
 	return common.HexToAddress(address)
 }
 
+// in wei precision (18 points)
 func GetAccountBalance(client *ethclient.Client, account common.Address) *big.Int {
 	balance, err := client.BalanceAt(context.Background(), account, nil)
 	if err != nil {
@@ -52,4 +53,12 @@ func GetAccountAddressBytes (accountAddress common.Address) []byte {
 
 func GetAccountAddress(account accounts.Account) common.Address {
 	return account.Address
+}
+
+func GetAccountPendingNonce(client *ethclient.Client, accountAddress common.Address) uint64 {
+	nonce, err := client.PendingNonceAt(context.Background(), accountAddress)
+	if err != nil {
+		log.Fatal("error getting account pending nonce", err)
+	}
+	return nonce
 }

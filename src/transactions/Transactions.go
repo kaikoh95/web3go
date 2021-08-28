@@ -2,14 +2,18 @@ package transactions
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"math/big"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	Blocks "github.com/kaikoh95/web3go/src/blocks"
+	Helpers "github.com/kaikoh95/web3go/src/helpers"
+	"golang.org/x/crypto/sha3"
 )
 
 type Transaction struct {
@@ -118,4 +122,29 @@ func GetSingleTransactionFromTransactionHash(hash common.Hash, client *ethclient
 		return t.FormatTransactionDetails(client, withReceipt)
 	}
 	return "Transaction " + tx.Hash().Hex() + " is pending"
+}
+
+func PrepareTokenTransactionData(methodName string, toAddr *common.Address, tokenAmountToSend int) []byte {
+	transferFnSignature := []byte(methodName)
+	hash := sha3.NewLegacyKeccak256()
+	hash.Write(transferFnSignature)
+	methodID := hash.Sum(nil)[:4]
+	fmt.Println("methodID ", hexutil.Encode(methodID)) // 0xa9059cbb
+	
+	paddedAddress := common.LeftPadBytes(toAddr.Bytes(), 32)
+	fmt.Println("paddedAddress 32-bits", hexutil.Encode(paddedAddress))
+	
+	fmt.Println("token amount to send", tokenAmountToSend)
+	weiTokenAmountToSend := Helpers.ToWei(tokenAmountToSend, 18)
+	fmt.Println("token amount to send in wei", weiTokenAmountToSend)
+
+	paddedAmount := common.LeftPadBytes(weiTokenAmountToSend.Bytes(), 32)
+	fmt.Println("padded amount 32-bits", hexutil.Encode(paddedAmount))
+	
+	var data []byte
+	data = append(data, methodID...)
+	data = append(data, paddedAddress...)
+	data = append(data, paddedAmount...)
+
+	return data
 }
